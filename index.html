@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador - K2 Seguridad y Resguardo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="top-header no-print">
+        <div class="logo-container">
+            <div class="logo">K2</div>
+            <h1>Cotizador Comercial</h1>
+        </div>
+        <p class="subtitle">Generador rápido y consistente de cotizaciones de Seguridad y Resguardo</p>
+    </header>
+
+    <main class="app-container">
+        <!-- Panel Izquierdo: Formulario -->
+        <section class="form-panel no-print">
+            <form id="quote-form">
+                <div class="form-section">
+                    <h2>Datos del Cliente y Servicio</h2>
+                    
+                    <div class="form-group">
+                        <label for="clientName">Nombre del Cliente / Empresa</label>
+                        <input type="text" id="clientName" placeholder="Ej. Corporación Acme S.A." required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="serviceType">Tipo de Servicio</label>
+                            <select id="serviceType" required>
+                                <option value="vigilancia">Servicio 1: Vigilancia (S/. 18/h)</option>
+                                <option value="resguardo">Servicio 2: Resguardo (S/. 35/h)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="numAgents">N° de Agentes por puesto (Mín. 2)</label>
+                            <input type="number" id="numAgents" min="2" value="2" required>
+                            <span class="hint" id="agentsHint">Mínimo 2 agentes requeridos.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Variables de Tiempo</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hoursPerShift">Horas por Turno</label>
+                            <input type="number" id="hoursPerShift" min="1" max="24" value="12" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="totalDays">Días Totales de Servicio</label>
+                            <input type="number" id="totalDays" min="1" value="30" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Modificadores de Tarifa</h2>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nightHoursPerShift">Horas Nocturnas por Turno (10pm-6am)</label>
+                            <input type="number" id="nightHoursPerShift" min="0" max="8" value="0" required>
+                            <span class="hint">+25% recargo sobre estas horas</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="sundayHolidayDays">Días Domingos / Feriados</label>
+                            <input type="number" id="sundayHolidayDays" min="0" value="0" required>
+                            <span class="hint">+35% recargo en estos días completos</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group checkbox-group">
+                            <label class="toggle-container">
+                                <input type="checkbox" id="highRiskZone">
+                                <span class="checkmark"></span>
+                                <span class="toggle-label">Zona de Riesgo Alto declarado (+15% subtotal)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Adicionales y Descuentos</h2>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="armedAgents">Cantidad de Agentes Armados</label>
+                            <input type="number" id="armedAgents" min="0" value="0" required>
+                            <span class="hint">+S/ 800 mensual por agente</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="contractMonths">Duración del Contrato (Meses)</label>
+                            <input type="number" id="contractMonths" min="1" value="1" required>
+                            <span class="hint">Descuentos desde 3 meses</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- Panel Derecho: Vista previa de Cotización -->
+        <section class="preview-panel">
+            <div class="invoice-card" id="invoice">
+                <div class="invoice-header">
+                    <div class="invoice-brand">K2 Seguridad y Resguardo</div>
+                    <div class="invoice-title">COTIZACIÓN DE SERVICIOS</div>
+                </div>
+                
+                <div class="invoice-meta">
+                    <div>
+                        <div class="meta-label">Cliente</div>
+                        <div class="meta-value" id="outClientName">-</div>
+                    </div>
+                    <div>
+                        <div class="meta-label">Fecha</div>
+                        <div class="meta-value" id="outDate">-</div>
+                    </div>
+                </div>
+
+                <div class="invoice-details">
+                    <div class="detail-row">
+                        <span>Servicio Solicitado:</span>
+                        <strong id="outServiceType">-</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Esquema Operativo:</span>
+                        <strong id="outScheme">-</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Duración de Contrato:</span>
+                        <strong id="outContract">-</strong>
+                    </div>
+                </div>
+
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Concepto</th>
+                            <th class="text-right">Horas/Cant</th>
+                            <th class="text-right">Importe S/.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoiceTableBody">
+                        <!-- Llenado por JS -->
+                    </tbody>
+                </table>
+
+                <div class="invoice-totals">
+                    <div class="total-row">
+                        <span>Subtotal Base</span>
+                        <span id="outSubtotalBase">S/. 0.00</span>
+                    </div>
+                    <div class="total-row highlight-modifier" id="rowNight" style="display:none;">
+                        <span>Recargo Nocturno (25%)</span>
+                        <span id="outNightSurcharge">S/. 0.00</span>
+                    </div>
+                    <div class="total-row highlight-modifier" id="rowSunday" style="display:none;">
+                        <span>Recargo Dom/Fer (35%)</span>
+                        <span id="outSundaySurcharge">S/. 0.00</span>
+                    </div>
+                    <div class="total-row highlight-modifier" id="rowRisk" style="display:none;">
+                        <span>Riesgo Alto (15%)</span>
+                        <span id="outRiskSurcharge">S/. 0.00</span>
+                    </div>
+                    <div class="total-row" id="rowArmed" style="display:none;">
+                        <span>Equipamiento Armado</span>
+                        <span id="outArmed">S/. 0.00</span>
+                    </div>
+                    <div class="total-row highlight-discount" id="rowDiscount" style="display:none;">
+                        <span id="outDiscountLabel">Descuento</span>
+                        <span id="outDiscount">S/. 0.00</span>
+                    </div>
+                    <div class="total-row subtotal-final">
+                        <span>Subtotal Neto</span>
+                        <span id="outSubtotalNet">S/. 0.00</span>
+                    </div>
+                    <div class="total-row igv">
+                        <span>IGV (18%)</span>
+                        <span id="outIgv">S/. 0.00</span>
+                    </div>
+                    <div class="total-row grand-total">
+                        <span>Total a Pagar (Mensual/Periodo)</span>
+                        <span id="outGrandTotal">S/. 0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions no-print">
+                <button id="btnPrint" class="btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    Generar PDF / Imprimir
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
